@@ -1,4 +1,4 @@
-import { X } from "lucide-react";
+import { BrainCircuit, Mail, Phone, Sparkles, X } from "lucide-react";
 import type { Candidate } from "../../types";
 
 type CandidateDetailsModalProps = {
@@ -31,45 +31,85 @@ export function CandidateDetailsModal({
   const missingSkills = getStringList(candidate.fit_result?.missing_skills);
   const strengths = getStringList(candidate.fit_result?.strengths);
   const concerns = getStringList(candidate.fit_result?.concerns);
+  const scoreLabel = candidate.fit_score === null ? "Not scored" : `${candidate.fit_score}/100`;
 
   return (
     <div className="modal-backdrop" role="presentation">
       <section className="job-modal candidate-view-modal" role="dialog" aria-modal="true" aria-labelledby="candidate-view-title">
-        <div className="modal-head">
-          <div>
-            <span className={`status-pill ${candidate.status}`}>{candidate.status}</span>
-            <h2 id="candidate-view-title">{candidate.name || "Unnamed candidate"}</h2>
-            <p>{candidate.email || "No email"} · {candidate.phone || "No phone"}</p>
+        <div className="candidate-profile-head">
+          <div className="candidate-avatar" aria-hidden="true">
+            {(candidate.name || "C").slice(0, 1).toUpperCase()}
+          </div>
+          <div className="candidate-title-group">
+            <div className="candidate-title-row">
+              <h2 id="candidate-view-title">{candidate.name || "Unnamed candidate"}</h2>
+              <span className={`status-pill ${candidate.status}`}>{candidate.status}</span>
+            </div>
+            <div className="candidate-contact-row">
+              <span><Mail size={15} />{candidate.email || "No email"}</span>
+              <span><Phone size={15} />{candidate.phone || "No phone"}</span>
+            </div>
           </div>
           <button className="icon-button" type="button" onClick={onClose} aria-label="Close details">
             <X size={20} />
           </button>
         </div>
 
-        <div className="candidate-score-strip">
-          <div>
-            <span>Fit score</span>
-            <strong>{candidate.fit_score ?? "Not scored"}</strong>
-          </div>
-          <div>
-            <span>Summary</span>
-            <p>{candidate.fit_summary || "No fit summary yet."}</p>
-          </div>
+        <div className="candidate-insight-grid">
+          <article className="candidate-score-card">
+            <span><Sparkles size={16} /> Fit score</span>
+            <strong>{scoreLabel}</strong>
+            <p>{candidate.fit_summary || "Run AI scoring to generate a concise recruiter summary."}</p>
+          </article>
+          <article className="candidate-explanation-card">
+            <span><BrainCircuit size={16} /> Fit explanation</span>
+            <p>{fitExplanation || "No fit explanation yet."}</p>
+          </article>
         </div>
 
-        <div className="detail-block">
-          <span>Resume</span>
+        <div className="candidate-review-grid">
+          <section className="candidate-panel">
+            <div className="candidate-panel-head">
+              <span>AI signals</span>
+              <small>Generated from resume and job requirements</small>
+            </div>
+            {matchedSkills.length || missingSkills.length || strengths.length || concerns.length ? (
+              <div className="ai-signals">
+                <SignalList tone="positive" label="Matched skills" values={matchedSkills} />
+                <SignalList tone="warning" label="Missing skills" values={missingSkills} />
+                <SignalList tone="positive" label="Strengths" values={strengths} />
+                <SignalList tone="neutral" label="Concerns" values={concerns} />
+              </div>
+            ) : (
+              <p>No detailed AI signals yet.</p>
+            )}
+          </section>
+
+          <section className="candidate-panel">
+            <div className="candidate-panel-head">
+              <span>Parsed profile</span>
+              <small>Extracted structured resume information</small>
+            </div>
+            <p>{parsedSkills ? parsedSkills : "No parsed resume data yet."}</p>
+          </section>
+        </div>
+
+        <section className="candidate-panel resume-panel">
+          <div className="candidate-panel-head">
+            <span>Resume</span>
+            <small>Formatted for recruiter review</small>
+          </div>
           {resumeSections.length > 0 ? (
-            <div className="resume-viewer">
+            <div className="resume-document">
               {resumeSections.map((section) => (
                 <article className="resume-section" key={section.title}>
                   <h3>{section.title}</h3>
                   {section.lines.length > 0 ? (
-                    <ul>
+                    <div className="resume-lines">
                       {section.lines.map((line, index) => (
-                        <li key={`${section.title}-${index}`}>{line}</li>
+                        <p key={`${section.title}-${index}`}>{line}</p>
                       ))}
-                    </ul>
+                    </div>
                   ) : null}
                 </article>
               ))}
@@ -77,32 +117,7 @@ export function CandidateDetailsModal({
           ) : (
             <p>No resume text stored.</p>
           )}
-        </div>
-
-        <div className="detail-block">
-          <span>Fit explanation</span>
-          <p>{fitExplanation || "No fit explanation yet."}</p>
-        </div>
-
-        <div className="detail-columns">
-          <div>
-            <span>Parsed profile</span>
-            <p>{parsedSkills ? `Skills: ${parsedSkills}` : "No parsed resume data yet."}</p>
-          </div>
-          <div>
-            <span>AI signals</span>
-            {matchedSkills.length || missingSkills.length || strengths.length || concerns.length ? (
-              <div className="ai-signals">
-                <SignalList label="Matched" values={matchedSkills} />
-                <SignalList label="Missing" values={missingSkills} />
-                <SignalList label="Strengths" values={strengths} />
-                <SignalList label="Concerns" values={concerns} />
-              </div>
-            ) : (
-              <p>No detailed AI signals yet.</p>
-            )}
-          </div>
-        </div>
+        </section>
 
         <div className="form-actions">
           <button className="primary-button" type="button" onClick={onEdit}>
@@ -123,15 +138,27 @@ export function CandidateDetailsModal({
   );
 }
 
-function SignalList({ label, values }: { label: string; values: string[] }) {
+function SignalList({
+  label,
+  values,
+  tone,
+}: {
+  label: string;
+  values: string[];
+  tone: "positive" | "warning" | "neutral";
+}) {
   if (values.length === 0) {
     return null;
   }
 
   return (
-    <div>
+    <div className={`signal-list ${tone}`}>
       <strong>{label}</strong>
-      <p>{values.join(", ")}</p>
+      <div>
+        {values.slice(0, 8).map((value) => (
+          <span key={value}>{value}</span>
+        ))}
+      </div>
     </div>
   );
 }
@@ -201,6 +228,7 @@ function splitResumeLines(content: string): string[] {
   return content
     .replace(/\s*[•]\s*/g, "\n")
     .replace(/\s+-\s+/g, " - ")
+    .replace(/\s+(?=(?:Languages|Backend & Cloud|GenAI|Frontend|Tools):)/g, "\n")
     .split(/\n|(?=\b[A-Z][A-Za-z .()]+(?:Engineer|Assistant|Generator)\b)|(?=\b[A-Z][A-Za-z .]+(?:\d{4}|Present)\b)/)
     .map((line) => line.replace(/\s+/g, " ").trim())
     .filter(Boolean)
