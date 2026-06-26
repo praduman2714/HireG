@@ -173,7 +173,7 @@ Install Command: npm ci
 Set environment variable:
 
 ```env
-VITE_API_BASE_URL=https://your-render-service.onrender.com
+VITE_API_BASE_URL=https://hireg-backend.onrender.com
 ```
 
 Deploy the project and copy the Vercel frontend URL.

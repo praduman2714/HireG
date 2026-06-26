@@ -46,7 +46,7 @@ Docker Compose overrides this for the backend container and uses the internal `d
 Live URLs:
 
 - Frontend: _add deployed frontend URL here_
-- Backend: _add deployed backend URL here_
+- Backend: https://hireg-backend.onrender.com
 
 Deployment notes and production environment variables are documented in [docs/deployment.md](docs/deployment.md).
 
