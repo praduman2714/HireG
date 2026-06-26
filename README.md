@@ -55,6 +55,22 @@ Jobs and candidates are recruiter-scoped. Candidate records include resume text,
 
 The backend owns authentication, recruiter-scoped data access, resume parsing, and fit scoring. The frontend provides the recruiter workflow for jobs and candidates.
 
+## Auth API
+
+Recruiter authentication uses JWT bearer tokens.
+
+Endpoints:
+
+- `POST /auth/register`
+- `POST /auth/login`
+- `GET /auth/me`
+
+Use the returned `access_token` as:
+
+```txt
+Authorization: Bearer <token>
+```
+
 ## Data Model
 
 Core entities:
