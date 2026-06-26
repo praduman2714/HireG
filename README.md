@@ -45,12 +45,12 @@ Docker Compose overrides this for the backend container and uses the internal `d
 
 Live URLs:
 
-- Frontend: _add deployed frontend URL here_
+- Frontend: https://hire-g.vercel.app
 - Backend: https://hireg-backend.onrender.com
 
 Deployment notes and production environment variables are documented in [docs/deployment.md](docs/deployment.md).
 
-For production, the backend Docker image runs Alembic migrations before starting FastAPI. The frontend Docker image builds the React app and serves it through Nginx. If the selected free-tier host sleeps after inactivity, mention that behavior here before submission.
+For production, the backend Docker image runs Alembic migrations before starting FastAPI. The frontend is deployed on Vercel and points to the Render backend. Render free services may sleep after inactivity, so the first backend request can take a little longer.
 
 ## Database
 

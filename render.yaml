@@ -24,6 +24,6 @@ services:
       - key: OPENAI_MODEL
         value: gpt-4o-mini
       - key: CORS_ORIGINS
-        value: '["http://localhost:5173"]'
+        value: '["http://localhost:5173","https://hire-g.vercel.app"]'
       - key: UPLOAD_DIR
         value: uploads

@@ -21,7 +21,7 @@ JWT_ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=60
 OPENAI_API_KEY=your_openai_api_key
 OPENAI_MODEL=gpt-4o-mini
-CORS_ORIGINS=["https://your-frontend-url.com"]
+CORS_ORIGINS=["https://hire-g.vercel.app"]
 UPLOAD_DIR=uploads
 ```
 
@@ -138,14 +138,14 @@ JWT_ALGORITHM=HS256
 ACCESS_TOKEN_EXPIRE_MINUTES=60
 OPENAI_API_KEY=your_openai_api_key
 OPENAI_MODEL=gpt-4o-mini
-CORS_ORIGINS=["http://localhost:5173"]
+CORS_ORIGINS=["https://hire-g.vercel.app"]
 UPLOAD_DIR=uploads
 ```
 
 After Render deploys, open:
 
 ```txt
-https://your-render-service.onrender.com/health
+https://hireg-backend.onrender.com/health
 ```
 
 Expected response:
@@ -183,7 +183,7 @@ Deploy the project and copy the Vercel frontend URL.
 Go back to the Render backend environment variables and update:
 
 ```env
-CORS_ORIGINS=["https://your-vercel-app.vercel.app"]
+CORS_ORIGINS=["https://hire-g.vercel.app"]
 ```
 
 Redeploy the backend after changing CORS.
@@ -193,8 +193,8 @@ Redeploy the backend after changing CORS.
 Update README live URLs:
 
 ```txt
-Frontend: https://your-vercel-app.vercel.app
-Backend: https://your-render-service.onrender.com
+Frontend: https://hire-g.vercel.app
+Backend: https://hireg-backend.onrender.com
 ```
 
 Also mention that Render free services may sleep after inactivity.

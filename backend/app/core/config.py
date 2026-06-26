@@ -12,7 +12,10 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 60
     openai_api_key: str | None = None
     openai_model: str = "gpt-4o-mini"
-    cors_origins: list[str] = ["http://localhost:5173"]
+    cors_origins: list[str] = [
+        "http://localhost:5173",
+        "https://hire-g.vercel.app",
+    ]
     upload_dir: str = "uploads"
 
     model_config = SettingsConfigDict(
