@@ -115,6 +115,7 @@ Endpoints:
 - `GET /candidates/{candidate_id}`
 - `PATCH /candidates/{candidate_id}`
 - `POST /candidates/{candidate_id}/parse-resume`
+- `POST /candidates/{candidate_id}/score-fit`
 - `DELETE /candidates/{candidate_id}`
 
 Supported candidate list filters:
@@ -137,6 +138,12 @@ Then call:
 
 ```txt
 POST /candidates/{candidate_id}/parse-resume
+```
+
+AI fit scoring compares the candidate's parsed resume data or resume text against the linked job. It saves `fit_score`, `fit_summary`, `fit_explanation`, and detailed `fit_result`.
+
+```txt
+POST /candidates/{candidate_id}/score-fit
 ```
 
 ## Data Model

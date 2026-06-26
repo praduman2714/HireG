@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.auth.dependencies import get_current_recruiter
 from app.auth.models import Recruiter
+from app.ai.fit_scorer import score_candidate_fit_with_ai
 from app.ai.resume_parser import parse_resume_with_ai
 from app.candidates.models import Candidate, CandidateStatus
 from app.candidates.resume_service import extract_resume_text, save_resume_file, validate_resume_file
@@ -178,6 +179,31 @@ def parse_candidate_resume(
         candidate.email = parsed_resume.email.lower()
     if not candidate.phone and parsed_resume.phone:
         candidate.phone = parsed_resume.phone
+
+    db.add(candidate)
+    db.commit()
+    db.refresh(candidate)
+    return candidate
+
+
+@router.post("/candidates/{candidate_id}/score-fit", response_model=CandidateRead)
+def score_candidate_fit(
+    candidate_id: uuid.UUID,
+    db: Session = Depends(get_db),
+    current_recruiter: Recruiter = Depends(get_current_recruiter),
+) -> Candidate:
+    candidate = get_recruiter_candidate(candidate_id, current_recruiter.id, db)
+    fit_score = score_candidate_fit_with_ai(
+        job=candidate.job,
+        parsed_resume=candidate.parsed_resume,
+        resume_text=candidate.resume_text,
+    )
+
+    fit_data = fit_score.model_dump()
+    candidate.fit_score = fit_score.score
+    candidate.fit_summary = fit_score.summary
+    candidate.fit_explanation = fit_score.explanation
+    candidate.fit_result = fit_data
 
     db.add(candidate)
     db.commit()
