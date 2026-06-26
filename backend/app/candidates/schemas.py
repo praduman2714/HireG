@@ -41,7 +41,7 @@ class CandidateUpdate(BaseModel):
     resume_text: str | None = None
     parsed_resume: dict[str, Any] | None = None
     fit_score: int | None = Field(default=None, ge=0, le=100)
-    fit_summary: str | None = Field(default=None, max_length=255)
+    fit_summary: str | None = None
     fit_explanation: str | None = None
     fit_result: dict[str, Any] | None = None
 

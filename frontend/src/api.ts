@@ -1,4 +1,4 @@
-import type { AuthResponse, DashboardStats, Job, Recruiter } from "./types";
+import type { AuthResponse, Candidate, DashboardStats, Job, Recruiter } from "./types";
 
 export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000";
 export const TOKEN_STORAGE_KEY = "hireg_access_token";
@@ -69,6 +69,74 @@ export async function closeJob(token: string, jobId: string): Promise<Job> {
 
 export async function deleteJob(token: string, jobId: string): Promise<void> {
   return apiRequest<void>(`/jobs/${jobId}`, token, { method: "DELETE" });
+}
+
+export async function getCandidatesForJob(
+  token: string,
+  jobId: string,
+  query = "",
+): Promise<Candidate[]> {
+  return apiRequest<Candidate[]>(
+    query ? `/jobs/${jobId}/candidates?${query}` : `/jobs/${jobId}/candidates`,
+    token,
+  );
+}
+
+export async function createCandidate(
+  token: string,
+  jobId: string,
+  payload: Record<string, unknown>,
+): Promise<Candidate> {
+  return apiRequest<Candidate>(`/jobs/${jobId}/candidates`, token, {
+    body: JSON.stringify(payload),
+    headers: { "Content-Type": "application/json" },
+    method: "POST",
+  });
+}
+
+export async function updateCandidate(
+  token: string,
+  candidateId: string,
+  payload: Record<string, unknown>,
+): Promise<Candidate> {
+  return apiRequest<Candidate>(`/candidates/${candidateId}`, token, {
+    body: JSON.stringify(payload),
+    headers: { "Content-Type": "application/json" },
+    method: "PATCH",
+  });
+}
+
+export async function deleteCandidate(token: string, candidateId: string): Promise<void> {
+  return apiRequest<void>(`/candidates/${candidateId}`, token, { method: "DELETE" });
+}
+
+export async function uploadCandidateResume(
+  token: string,
+  jobId: string,
+  formData: FormData,
+): Promise<Candidate> {
+  return apiRequest<Candidate>(`/jobs/${jobId}/candidates/upload-resume`, token, {
+    body: formData,
+    method: "POST",
+  });
+}
+
+export async function parseCandidateResume(
+  token: string,
+  candidateId: string,
+): Promise<Candidate> {
+  return apiRequest<Candidate>(`/candidates/${candidateId}/parse-resume`, token, {
+    method: "POST",
+  });
+}
+
+export async function scoreCandidateFit(
+  token: string,
+  candidateId: string,
+): Promise<Candidate> {
+  return apiRequest<Candidate>(`/candidates/${candidateId}/score-fit`, token, {
+    method: "POST",
+  });
 }
 
 export async function apiRequest<T>(

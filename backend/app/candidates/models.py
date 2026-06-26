@@ -61,7 +61,7 @@ class Candidate(TimestampMixin, Base):
     resume_text: Mapped[str | None] = mapped_column(Text)
     parsed_resume: Mapped[dict | None] = mapped_column(JSONB)
     fit_score: Mapped[int | None] = mapped_column(Integer, index=True)
-    fit_summary: Mapped[str | None] = mapped_column(String(255))
+    fit_summary: Mapped[str | None] = mapped_column(Text)
     fit_explanation: Mapped[str | None] = mapped_column(Text)
     fit_result: Mapped[dict | None] = mapped_column(JSONB)
 

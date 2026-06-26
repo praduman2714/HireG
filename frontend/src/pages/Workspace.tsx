@@ -1,9 +1,10 @@
-import { FileText, UsersRound } from "lucide-react";
+import { FileText } from "lucide-react";
 import { useState } from "react";
 import { PlaceholderSection } from "../components/PlaceholderSection";
 import { Sidebar } from "../components/Sidebar";
 import { TopNav } from "../components/TopNav";
 import { DashboardHome } from "./DashboardHome";
+import { CandidatesPage } from "./CandidatesPage";
 import { JobsPage } from "./JobsPage";
 import type { AppSection, Recruiter } from "../types";
 
@@ -25,13 +26,7 @@ export function Workspace({ recruiter, token, onLogout }: WorkspaceProps) {
           <DashboardHome token={token} recruiter={recruiter} onNavigate={setActiveSection} />
         ) : null}
         {activeSection === "jobs" ? <JobsPage token={token} /> : null}
-        {activeSection === "candidates" ? (
-          <PlaceholderSection
-            icon={<UsersRound size={22} />}
-            title="Candidates"
-            description="Candidate list, resume upload, parsing, and fit scoring will live here in the next UI phase."
-          />
-        ) : null}
+        {activeSection === "candidates" ? <CandidatesPage token={token} /> : null}
         {activeSection === "applications" ? (
           <PlaceholderSection
             icon={<FileText size={22} />}
