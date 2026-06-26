@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -11,6 +12,22 @@ from app.db.session import get_db
 
 
 router = APIRouter(prefix="/auth", tags=["auth"])
+
+
+def authenticate_recruiter(email: str, password: str, db: Session) -> Recruiter:
+    recruiter = db.scalar(select(Recruiter).where(Recruiter.email == email.lower()))
+    if recruiter is None or not verify_password(password, recruiter.hashed_password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect email or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    return recruiter
+
+
+def build_token_response(recruiter: Recruiter) -> Token:
+    access_token = create_access_token(str(recruiter.id))
+    return Token(access_token=access_token, recruiter=RecruiterRead.model_validate(recruiter))
 
 
 @router.post("/register", response_model=Token, status_code=status.HTTP_201_CREATED)
@@ -35,26 +52,25 @@ def register_recruiter(
     db.commit()
     db.refresh(recruiter)
 
-    access_token = create_access_token(str(recruiter.id))
-    return Token(access_token=access_token, recruiter=RecruiterRead.model_validate(recruiter))
+    return build_token_response(recruiter)
 
 
 @router.post("/login", response_model=Token)
 def login_recruiter(
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(get_db),
+) -> Token:
+    recruiter = authenticate_recruiter(form_data.username, form_data.password, db)
+    return build_token_response(recruiter)
+
+
+@router.post("/login-json", response_model=Token)
+def login_recruiter_json(
     payload: RecruiterLogin,
     db: Session = Depends(get_db),
 ) -> Token:
-    email = payload.email.lower()
-    recruiter = db.scalar(select(Recruiter).where(Recruiter.email == email))
-    if recruiter is None or not verify_password(payload.password, recruiter.hashed_password):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect email or password",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-
-    access_token = create_access_token(str(recruiter.id))
-    return Token(access_token=access_token, recruiter=RecruiterRead.model_validate(recruiter))
+    recruiter = authenticate_recruiter(payload.email, payload.password, db)
+    return build_token_response(recruiter)
 
 
 @router.get("/me", response_model=RecruiterRead)

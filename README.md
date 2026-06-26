@@ -33,6 +33,14 @@ Recruiter workspace for managing job openings, candidates, AI resume parsing, an
    - Frontend: `http://localhost:5173`
    - Backend health check: `http://localhost:8000/health`
 
+For local Uvicorn outside Docker, use `localhost` in `.env`:
+
+```env
+DATABASE_URL=postgresql+psycopg://hireg:hireg@localhost:5432/hireg
+```
+
+Docker Compose overrides this for the backend container and uses the internal `db` hostname.
+
 ## Database
 
 The initial schema is managed with Alembic.
@@ -63,13 +71,37 @@ Endpoints:
 
 - `POST /auth/register`
 - `POST /auth/login`
+- `POST /auth/login-json`
 - `GET /auth/me`
 
-Use the returned `access_token` as:
+Swagger's Authorize button uses `POST /auth/login`. Enter the recruiter email in the `username` field and the recruiter password in the `password` field. Leave `client_id` and `client_secret` blank.
+
+Use returned access tokens as:
 
 ```txt
 Authorization: Bearer <token>
 ```
+
+## Jobs API
+
+Job routes are protected and scoped to the authenticated recruiter.
+
+Endpoints:
+
+- `POST /jobs`
+- `GET /jobs`
+- `GET /jobs/{job_id}`
+- `PATCH /jobs/{job_id}`
+- `POST /jobs/{job_id}/close`
+- `DELETE /jobs/{job_id}`
+
+Supported list filters:
+
+- `status`
+- `search`
+- `department`
+- `location`
+- `employment_type`
 
 ## Data Model
 
