@@ -17,7 +17,7 @@ branch_labels: Union[str, Sequence[str], None] = None
 depends_on: Union[str, Sequence[str], None] = None
 
 
-job_status = postgresql.ENUM("open", "closed", name="job_status")
+job_status = postgresql.ENUM("open", "closed", name="job_status", create_type=False)
 candidate_status = postgresql.ENUM(
     "new",
     "reviewing",
@@ -25,12 +25,20 @@ candidate_status = postgresql.ENUM(
     "rejected",
     "hired",
     name="candidate_status",
+    create_type=False,
 )
 
 
 def upgrade() -> None:
-    job_status.create(op.get_bind(), checkfirst=True)
-    candidate_status.create(op.get_bind(), checkfirst=True)
+    postgresql.ENUM("open", "closed", name="job_status").create(op.get_bind(), checkfirst=True)
+    postgresql.ENUM(
+        "new",
+        "reviewing",
+        "shortlisted",
+        "rejected",
+        "hired",
+        name="candidate_status",
+    ).create(op.get_bind(), checkfirst=True)
 
     op.create_table(
         "recruiters",
