@@ -41,6 +41,17 @@ DATABASE_URL=postgresql+psycopg://hireg:hireg@localhost:5432/hireg
 
 Docker Compose overrides this for the backend container and uses the internal `db` hostname.
 
+## Deployment
+
+Live URLs:
+
+- Frontend: _add deployed frontend URL here_
+- Backend: _add deployed backend URL here_
+
+Deployment notes and production environment variables are documented in [docs/deployment.md](docs/deployment.md).
+
+For production, the backend Docker image runs Alembic migrations before starting FastAPI. The frontend Docker image builds the React app and serves it through Nginx. If the selected free-tier host sleeps after inactivity, mention that behavior here before submission.
+
 ## Database
 
 The initial schema is managed with Alembic.
