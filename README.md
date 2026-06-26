@@ -103,6 +103,23 @@ Supported list filters:
 - `location`
 - `employment_type`
 
+## Candidates API
+
+Candidate routes are protected and scoped to the authenticated recruiter. Candidates are linked to jobs.
+
+Endpoints:
+
+- `POST /jobs/{job_id}/candidates`
+- `GET /jobs/{job_id}/candidates`
+- `GET /candidates/{candidate_id}`
+- `PATCH /candidates/{candidate_id}`
+- `DELETE /candidates/{candidate_id}`
+
+Supported candidate list filters:
+
+- `status`
+- `search`
+
 ## Data Model
 
 Core entities:
