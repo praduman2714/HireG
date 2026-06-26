@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 
 from app.auth.dependencies import get_current_recruiter
 from app.auth.models import Recruiter
+from app.ai.resume_parser import parse_resume_with_ai
 from app.candidates.models import Candidate, CandidateStatus
 from app.candidates.resume_service import extract_resume_text, save_resume_file, validate_resume_file
 from app.candidates.schemas import CandidateCreate, CandidateRead, CandidateUpdate
@@ -147,6 +148,36 @@ def update_candidate(
 
     for field, value in updates.items():
         setattr(candidate, field, value)
+
+    db.add(candidate)
+    db.commit()
+    db.refresh(candidate)
+    return candidate
+
+
+@router.post("/candidates/{candidate_id}/parse-resume", response_model=CandidateRead)
+def parse_candidate_resume(
+    candidate_id: uuid.UUID,
+    db: Session = Depends(get_db),
+    current_recruiter: Recruiter = Depends(get_current_recruiter),
+) -> Candidate:
+    candidate = get_recruiter_candidate(candidate_id, current_recruiter.id, db)
+    if not candidate.resume_text:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Candidate does not have resume text to parse",
+        )
+
+    parsed_resume = parse_resume_with_ai(candidate.resume_text)
+    parsed_data = parsed_resume.model_dump()
+    candidate.parsed_resume = parsed_data
+
+    if not candidate.name and parsed_resume.name:
+        candidate.name = parsed_resume.name
+    if not candidate.email and parsed_resume.email:
+        candidate.email = parsed_resume.email.lower()
+    if not candidate.phone and parsed_resume.phone:
+        candidate.phone = parsed_resume.phone
 
     db.add(candidate)
     db.commit()

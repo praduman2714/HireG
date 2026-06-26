@@ -114,6 +114,7 @@ Endpoints:
 - `GET /jobs/{job_id}/candidates`
 - `GET /candidates/{candidate_id}`
 - `PATCH /candidates/{candidate_id}`
+- `POST /candidates/{candidate_id}/parse-resume`
 - `DELETE /candidates/{candidate_id}`
 
 Supported candidate list filters:
@@ -122,6 +123,21 @@ Supported candidate list filters:
 - `search`
 
 Resume upload supports PDF, DOCX, and TXT files. Uploaded files are stored in `backend/uploads/resumes` locally, and extracted text is saved on the candidate record as `resume_text`.
+
+AI resume parsing uses `OPENAI_API_KEY` and `OPENAI_MODEL`. The parser reads a candidate's `resume_text`, extracts structured resume data, saves it as `parsed_resume`, and backfills missing candidate name, email, and phone fields when available.
+
+Set these before testing AI parsing:
+
+```env
+OPENAI_API_KEY=your_api_key_here
+OPENAI_MODEL=gpt-4o-mini
+```
+
+Then call:
+
+```txt
+POST /candidates/{candidate_id}/parse-resume
+```
 
 ## Data Model
 
