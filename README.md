@@ -33,6 +33,24 @@ Recruiter workspace for managing job openings, candidates, AI resume parsing, an
    - Frontend: `http://localhost:5173`
    - Backend health check: `http://localhost:8000/health`
 
+## Database
+
+The initial schema is managed with Alembic.
+
+Run migrations inside the backend container:
+
+```bash
+docker-compose run --rm backend alembic upgrade head
+```
+
+Core tables:
+
+- `recruiters`
+- `jobs`
+- `candidates`
+
+Jobs and candidates are recruiter-scoped. Candidate records include resume text, parsed resume JSON, fit score, and AI scoring output.
+
 ## Architecture Notes
 
 The backend owns authentication, recruiter-scoped data access, resume parsing, and fit scoring. The frontend provides the recruiter workflow for jobs and candidates.
@@ -45,7 +63,7 @@ Core entities:
 - Jobs
 - Candidates
 
-Candidate records will store structured resume data, AI fit scores, and the AI explanation for recruiter review.
+Candidate records store structured resume data, AI fit scores, and the AI explanation for recruiter review.
 
 ## AI Strategy
 
