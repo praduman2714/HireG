@@ -110,6 +110,7 @@ Candidate routes are protected and scoped to the authenticated recruiter. Candid
 Endpoints:
 
 - `POST /jobs/{job_id}/candidates`
+- `POST /jobs/{job_id}/candidates/upload-resume`
 - `GET /jobs/{job_id}/candidates`
 - `GET /candidates/{candidate_id}`
 - `PATCH /candidates/{candidate_id}`
@@ -119,6 +120,8 @@ Supported candidate list filters:
 
 - `status`
 - `search`
+
+Resume upload supports PDF, DOCX, and TXT files. Uploaded files are stored in `backend/uploads/resumes` locally, and extracted text is saved on the candidate record as `resume_text`.
 
 ## Data Model
 

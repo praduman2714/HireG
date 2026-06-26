@@ -12,6 +12,7 @@ class Settings(BaseSettings):
     access_token_expire_minutes: int = 60
     openai_api_key: str | None = None
     cors_origins: list[str] = ["http://localhost:5173"]
+    upload_dir: str = "uploads"
 
     model_config = SettingsConfigDict(
         env_file=(".env", "../.env"),

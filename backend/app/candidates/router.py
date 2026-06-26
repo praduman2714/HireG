@@ -1,12 +1,13 @@
 import uuid
 
-from fastapi import APIRouter, Depends, HTTPException, Query, status
+from fastapi import APIRouter, Depends, File, Form, HTTPException, Query, UploadFile, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.auth.dependencies import get_current_recruiter
 from app.auth.models import Recruiter
 from app.candidates.models import Candidate, CandidateStatus
+from app.candidates.resume_service import extract_resume_text, save_resume_file, validate_resume_file
 from app.candidates.schemas import CandidateCreate, CandidateRead, CandidateUpdate
 from app.db.session import get_db
 from app.jobs.router import get_recruiter_job
@@ -56,6 +57,41 @@ def create_candidate(
         status=payload.status,
         resume_text=payload.resume_text,
         parsed_resume=payload.parsed_resume,
+    )
+    db.add(candidate)
+    db.commit()
+    db.refresh(candidate)
+    return candidate
+
+
+@router.post(
+    "/jobs/{job_id}/candidates/upload-resume",
+    response_model=CandidateRead,
+    status_code=status.HTTP_201_CREATED,
+)
+def upload_candidate_resume(
+    job_id: uuid.UUID,
+    file: UploadFile = File(...),
+    name: str | None = Form(default=None),
+    email: str | None = Form(default=None),
+    phone: str | None = Form(default=None),
+    db: Session = Depends(get_db),
+    current_recruiter: Recruiter = Depends(get_current_recruiter),
+) -> Candidate:
+    get_recruiter_job(job_id, current_recruiter.id, db)
+
+    suffix = validate_resume_file(file)
+    file_path = save_resume_file(file, suffix)
+    resume_text = extract_resume_text(file_path)
+
+    candidate = Candidate(
+        job_id=job_id,
+        recruiter_id=current_recruiter.id,
+        name=name.strip() if name else None,
+        email=email.strip().lower() if email else None,
+        phone=phone.strip() if phone else None,
+        resume_file_path=str(file_path),
+        resume_text=resume_text,
     )
     db.add(candidate)
     db.commit()
